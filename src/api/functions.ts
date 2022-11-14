@@ -22,7 +22,7 @@ function api<Request, Response>({
   responseSchema: z.ZodType<Response>;
 }): (data: Request) => Promise<Response> {
   return function (requestData: Request) {
-    if (!requestSchema.safeParse(requestData)) {
+    if (!requestSchema.safeParse(requestData).success) {
       throw new Error("Bad request");
     }
 

@@ -49,7 +49,7 @@ export const Navbar = () => {
                 isActive ? "underline underline-offset-4" : undefined
               }
             >
-              HOME
+              CREATE POOL
             </NavLink>
           </li>
           <li

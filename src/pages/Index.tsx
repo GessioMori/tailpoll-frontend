@@ -3,14 +3,11 @@ import { CreatePool } from "../components/CreatePool";
 
 export const Index: FunctionComponent = () => {
   return (
-    <>
-      <div className={"text-6xl font-extrabold text-center  mb-4"}>
-        Hello, TailPool!
-      </div>
-      <div className={"text-4xl  text-center"}>
-        A pool app implementing TailwindCSS and RadixUI
+    <div className="pt-8 flex flex-col gap-8">
+      <div className="text-6xl font-extrabold text-center  mb-4">
+        What's the question?
       </div>
       <CreatePool />
-    </>
+    </div>
   );
 };
