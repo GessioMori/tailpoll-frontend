@@ -1,21 +1,28 @@
-import { Navbar } from "./components/Navbar";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import { Root } from "./components/Root";
+import { Index } from "./pages/Index";
+import { PoolPage } from "./pages/PoolPage";
+import { UserPools } from "./pages/UserPools";
+import { UserVotes } from "./pages/UserVotes";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Root />}>
+      <Route index element={<Index />} />
+      <Route path="/pools" element={<UserPools />} />
+      <Route path="/votes" element={<UserVotes />} />
+      <Route path="/pool/:id" element={<PoolPage />} />
+    </Route>
+  )
+);
 
 const App = () => {
-  return (
-    <>
-      <Navbar />
-      <div
-        className={
-          "text-6xl font-extrabold text-center text-zinc-900 dark:text-zinc-200 mb-4"
-        }
-      >
-        Hello, TailPool!
-      </div>
-      <div className={"text-4xl  text-center text-zinc-900 dark:text-zinc-200"}>
-        A pool app implementing TailwindCSS and RadixUI
-      </div>
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
