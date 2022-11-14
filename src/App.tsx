@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -16,13 +17,19 @@ const router = createBrowserRouter(
       <Route index element={<Index />} />
       <Route path="/pools" element={<UserPools />} />
       <Route path="/votes" element={<UserVotes />} />
-      <Route path="/pool/:id" element={<PoolPage />} />
+      <Route path="/pool/:poolId" element={<PoolPage />} />
     </Route>
   )
 );
 
+const queryClient = new QueryClient();
+
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 };
 
 export default App;
