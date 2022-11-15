@@ -4,10 +4,8 @@ import { z } from "zod";
 export enum HTTPMethod {
   GET = "GET",
   POST = "POST",
-}
-
-export enum HTTPStatusCode {
-  OK = 200,
+  DELETE = "DELETE",
+  PATCH = "PATCH",
 }
 
 function api<
@@ -42,7 +40,6 @@ function api<
           data: requestData.data,
           withCredentials: true,
         });
-
         const result = responseSchema.safeParse(response.data);
 
         if (!result.success) {
@@ -89,7 +86,6 @@ const getPoolResponse = z.object({
   pool: poolObj,
   isOwner: z.boolean(),
 });
-
 export const getPool = api<
   z.infer<typeof getPoolRequest>,
   z.infer<typeof getPoolResponse>
@@ -172,4 +168,20 @@ export const getVote = api<
   path: "/vote",
   requestSchema: getVoteRequest,
   responseSchema: getVoteResponse,
+});
+
+const deletePoolRequest = z.object({
+  params: z.object({
+    id: z.string().cuid().nullish(),
+  }),
+});
+const deletePoolResponse = z.any();
+export const deletePool = api<
+  z.infer<typeof deletePoolRequest>,
+  z.infer<typeof deletePoolResponse>
+>({
+  method: HTTPMethod.DELETE,
+  path: "/pool",
+  requestSchema: deletePoolRequest,
+  responseSchema: deletePoolResponse,
 });

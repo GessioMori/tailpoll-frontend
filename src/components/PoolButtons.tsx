@@ -1,4 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { deletePool } from "../api";
 
 type PoolButtonsProps = {
   isOwner: boolean;
@@ -9,20 +12,34 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
   isOwner,
   handlePoolRefetch,
 }) => {
+  const { poolId } = useParams();
+  const navigate = useNavigate();
   const [refreshed, setRefreshed] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deletePoolMutation = useMutation({
+    mutationFn: () => deletePool({ params: { id: poolId } }),
+  });
+
+  const handlePoolDeletion = () => {
+    deletePoolMutation
+      .mutateAsync()
+      .then(() => navigate("/"))
+      .catch(() => setError("Some error happened, try again!"));
+  };
 
   if (isClosing) {
     return (
       <div className="w-full px-5">
         <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
           Close pool?
-          <button className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110">
+          <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110">
             Yes
           </button>
           <button
-            className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
+            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
             onClick={() => setIsClosing(false)}
           >
             No
@@ -37,11 +54,14 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
       <div className="w-full px-5">
         <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
           Delete pool?
-          <button className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110">
-            Yes
-          </button>
           <button
             className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
+            onClick={() => handlePoolDeletion()}
+          >
+            {deletePoolMutation.isLoading ? "Deleting" : "Yes"}
+          </button>
+          <button
+            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
             onClick={() => setIsDeleting(false)}
           >
             No
