@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { FunctionComponent } from "react";
 import { useParams } from "react-router-dom";
-import { getPool } from "../api/functions";
+import { getPool } from "../api";
 
 export const PoolPage: FunctionComponent = () => {
   const { poolId } = useParams();

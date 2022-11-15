@@ -1,13 +1,17 @@
+import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { createPool, createPoolRequest } from "../api";
 
-type newPoolType = {
-  question?: string;
-  options: (string | undefined)[];
+type fieldValues = {
+  question: string;
+  options: { value: string }[];
 };
 
 export const CreatePool: FunctionComponent = () => {
-  const { control, register, handleSubmit } = useForm();
+  const { control, register, handleSubmit } = useForm<fieldValues>();
   const { fields, append, prepend, remove } = useFieldArray({
     control,
     name: "options",
@@ -15,10 +19,25 @@ export const CreatePool: FunctionComponent = () => {
       minLength: 2,
     },
   });
-  const onSubmit = (data) => console.log(data);
+  const navigate = useNavigate();
+
+  const createPoolMutation = useMutation({
+    mutationFn: (newPool: z.infer<typeof createPoolRequest>) =>
+      createPool(newPool),
+  });
+
+  const onSubmit = (data: fieldValues) => {
+    createPoolMutation
+      .mutateAsync({
+        options: data.options.map((option) => option.value),
+        question: data.question,
+      })
+      .then((response) => navigate("/pool/" + response.id));
+  };
 
   useEffect(() => {
-    prepend({});
+    prepend({ value: "" }, { shouldFocus: false });
+    prepend({ value: "" }, { shouldFocus: false });
   }, []);
 
   return (
@@ -68,7 +87,8 @@ export const CreatePool: FunctionComponent = () => {
           <div className="flex justify-start">
             <button
               className="fill-transparent stroke-zinc-700 hover:stroke-sky-600 hover:cursor-pointer"
-              onClick={() => append({})}
+              onClick={() => append({ value: "" })}
+              type="button"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -88,13 +108,13 @@ export const CreatePool: FunctionComponent = () => {
             </button>
           </div>
         )}
-
         <div className="flex justify-center">
           <button
-            className="mt-4 bg-gradient-to-tr from-[#00F260] to-[#0575E6] px-10 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-[#0575E6] hover:outline-[#0575E6]"
+            className="mt-4 bg-gradient-to-tr from-[#00F260] to-[#0575E6] px-10 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-[#0575E6] hover:brightness-125 disabled:cursor-not-allowed"
             type="submit"
+            disabled={createPoolMutation.isLoading}
           >
-            Create pool
+            {createPoolMutation.isLoading ? "Creating pool..." : "Create pool"}
           </button>
         </div>
       </form>
