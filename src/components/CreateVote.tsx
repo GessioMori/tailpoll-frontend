@@ -6,6 +6,7 @@ import { createVote } from "../api";
 type CreateVoteComponentProps = {
   question: string;
   options: string[];
+  endsAt?: string | null;
   fetchVote: () => void;
 };
 
@@ -29,6 +30,7 @@ export const CreateVoteComponent: FunctionComponent<
         <div className="text-3xl font-bold">
           <h1>{question}</h1>
         </div>
+
         <div className="flex flex-col gap-2">
           {options.map((option, index) => (
             <button

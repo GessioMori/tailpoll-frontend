@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { isBefore } from "date-fns";
 import { FunctionComponent, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getPoll, getResults, getVote } from "../api";
@@ -48,9 +49,7 @@ export const PollPage: FunctionComponent = () => {
   }, [pollData]);
 
   useEffect(() => {
-    if (voteData) {
-      fetchResults();
-    }
+    fetchResults();
   }, [voteData]);
 
   if (isLoading) {
@@ -77,17 +76,23 @@ export const PollPage: FunctionComponent = () => {
 
   return (
     <>
-      {(pollData.isOwner || voteData) && resultsData ? (
+      {(pollData.isOwner ||
+        voteData ||
+        (pollData.poll.endsAt &&
+          isBefore(new Date(pollData.poll.endsAt), new Date()))) &&
+      resultsData ? (
         <ResultsComponent
           question={pollData.poll.question}
           options={pollData.poll.options}
           votes={resultsData}
           userVote={voteData?.option}
+          endsAt={pollData.poll.endsAt}
         />
       ) : (
         <CreateVoteComponent
           question={pollData.poll.question}
           options={pollData.poll.options}
+          endsAt={pollData.poll.endsAt}
           fetchVote={handleVoteFetch}
         />
       )}

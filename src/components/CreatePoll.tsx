@@ -4,14 +4,17 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { createPoll, createPollRequest } from "../api";
+import { EndsInComponentMemo } from "./EndsIn";
 
-type fieldValues = {
+export type fieldValues = {
   question: string;
   options: { value: string }[];
 };
 
 export const CreatePoll: FunctionComponent = () => {
   const [isEndEnable, setIsEndEnable] = useState(false);
+  const [endsAt, setEndsAt] = useState<Date | undefined>(undefined);
+
   const {
     control,
     register,
@@ -39,6 +42,7 @@ export const CreatePoll: FunctionComponent = () => {
         data: {
           options: data.options.map((option) => option.value),
           question: data.question,
+          endsAt,
         },
       })
       .then((response) => navigate("/poll/" + response.id));
@@ -49,6 +53,14 @@ export const CreatePoll: FunctionComponent = () => {
     prepend({ value: "" }, { shouldFocus: false });
   }, []);
 
+  const handleSetEndToggler = () => {
+    setIsEndEnable((current) => !current);
+  };
+
+  const handleSetEndDate = (date: Date) => {
+    setEndsAt(() => date);
+  };
+
   return (
     <div className="w-full px-5">
       <form
@@ -58,11 +70,15 @@ export const CreatePoll: FunctionComponent = () => {
         <textarea
           placeholder="Is Tailpoll your favorite poll platform?"
           className="w-full  bg-zinc-300 dark:bg-zinc-800 p-2 rounded-md border-2 border-transparent focus:border-2 focus:border-sky-400 outline-none resize-none"
-          {...register("question", { required: true, minLength: 10 })}
+          {...register("question", {
+            required: true,
+            minLength: 10,
+            maxLength: 300,
+          })}
         />
         {errors.question && (
           <div className="text-sm text-red-400">
-            Question must have at least 10 characters!
+            Question must have between 10 to 300 characters!
           </div>
         )}
         {fields.map((field, index) => {
@@ -72,6 +88,7 @@ export const CreatePoll: FunctionComponent = () => {
                 className="w-full bg-zinc-300 dark:bg-zinc-800 p-2 rounded-md border-2 border-transparent focus:border-2 focus:border-sky-400 outline-none"
                 {...register(`options.${index}.value`, {
                   minLength: 2,
+                  maxLength: 50,
                   required: true,
                 })}
                 placeholder={
@@ -82,6 +99,7 @@ export const CreatePoll: FunctionComponent = () => {
                 disabled={fields.length < 3}
                 className="fill-transparent px-1 stroke-zinc-700 hover:stroke-red-500 hover:cursor-pointer disabled:stroke-zinc-900 disabled:dark:stroke-zinc-200 disabled:opacity-10 disabled:cursor-not-allowed"
                 onClick={() => remove(index)}
+                type="button"
               >
                 <svg
                   className="w-6 h-6 "
@@ -102,18 +120,26 @@ export const CreatePoll: FunctionComponent = () => {
         })}
         {errors.options && (
           <div className="text-sm text-red-400">
-            All options must have at least 2 characters!
+            All options must have between 2 to 50 characters!
           </div>
         )}
 
         <div className="flex justify-between mt-2">
-          <button
-            type="button"
-            className="bg-green-500 rounded-md px-4 py-2 font-bold hover:brightness-90"
-            onClick={() => setIsEndEnable(true)}
-          >
-            Set end time
-          </button>
+          {isEndEnable ? (
+            <EndsInComponentMemo
+              handleSetEndToggler={handleSetEndToggler}
+              handleSetEndDate={handleSetEndDate}
+            />
+          ) : (
+            <button
+              type="button"
+              className="bg-green-500 rounded-md px-4 py-2 font-bold text-zinc-100 hover:brightness-90"
+              onClick={() => setIsEndEnable(true)}
+            >
+              Set end time
+            </button>
+          )}
+
           {fields.length < 11 && (
             <button
               className="fill-transparent stroke-zinc-700 dark:stroke-zinc-400 hover:stroke-sky-600 hover:cursor-pointer"

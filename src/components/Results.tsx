@@ -1,8 +1,10 @@
+import { format, isBefore } from "date-fns";
 import { FunctionComponent } from "react";
 
 type ResultsComponentProps = {
   question: string;
   options: string[];
+  endsAt?: string | null;
   votes: {
     _count: number;
     option: number;
@@ -15,6 +17,7 @@ export const ResultsComponent: FunctionComponent<ResultsComponentProps> = ({
   question,
   votes,
   userVote,
+  endsAt,
 }) => {
   const totalVotes = votes.reduce((acc, cur) => acc + cur._count, 0);
 
@@ -29,6 +32,18 @@ export const ResultsComponent: FunctionComponent<ResultsComponentProps> = ({
         <div className="text-3xl font-bold">
           <h1>{question}</h1>
         </div>
+        {endsAt && (
+          <div className="text-md font-thin">
+            <h3>
+              {isBefore(new Date(), new Date(endsAt))
+                ? "Ends at: "
+                : "Ended at :"}
+
+              {format(new Date(endsAt), " dd/MM/yyyy - HH:mm")}
+            </h3>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
           {optionsWithVotes.map((option, index) => {
             const percentage =
