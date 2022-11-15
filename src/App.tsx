@@ -22,7 +22,16 @@ const router = createBrowserRouter(
   )
 );
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    },
+    mutations: { retry: false },
+  },
+});
 
 const App = () => {
   return (

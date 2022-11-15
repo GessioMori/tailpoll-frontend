@@ -10,7 +10,13 @@ export enum HTTPStatusCode {
   OK = 200,
 }
 
-function api<Request, Response>({
+function api<
+  Request extends {
+    params?: Record<string, string | undefined | null>;
+    data?: Record<string, string | string[] | number | Date | undefined | null>;
+  },
+  Response
+>({
   method,
   path,
   requestSchema,
@@ -31,7 +37,8 @@ function api<Request, Response>({
         baseURL: import.meta.env.VITE_BASEURL,
         method,
         url: path,
-        [method === HTTPMethod.GET ? "params" : "data"]: requestData,
+        params: requestData.params,
+        data: requestData.data,
         withCredentials: true,
       });
 
@@ -58,7 +65,9 @@ const poolObj = z.object({
 });
 
 const getPoolRequest = z.object({
-  id: z.string().cuid().nullish(),
+  params: z.object({
+    id: z.string().cuid().nullish(),
+  }),
 });
 const getPoolResponse = z.object({
   pool: poolObj,
@@ -76,9 +85,11 @@ export const getPool = api<
 });
 
 export const createPoolRequest = z.object({
-  question: z.string().min(10).max(300),
-  options: z.array(z.string().min(2).max(50)).min(2),
-  endsAt: z.date().min(new Date()).nullish(),
+  data: z.object({
+    question: z.string().min(10).max(300),
+    options: z.array(z.string().min(2).max(50)).min(2),
+    endsAt: z.date().min(new Date()).nullish(),
+  }),
 });
 const createPoolResponse = poolObj;
 export const createPool = api<
@@ -89,4 +100,51 @@ export const createPool = api<
   path: "/pool",
   requestSchema: createPoolRequest,
   responseSchema: createPoolResponse,
+});
+
+const createVoteRequest = z.object({
+  data: z.object({
+    option: z.number().min(0).max(9),
+  }),
+  params: z.object({
+    id: z.string().cuid().nullish(),
+  }),
+});
+const createVoteResponse = z.object({
+  id: z.string().cuid(),
+  createdAt: z.string(),
+  voterToken: z.string().cuid(),
+  option: z.number().min(0).max(9),
+  poolId: z.string().cuid(),
+});
+
+export const createVote = api<
+  z.infer<typeof createVoteRequest>,
+  z.infer<typeof createVoteResponse>
+>({
+  method: HTTPMethod.POST,
+  path: "/vote",
+  requestSchema: createVoteRequest,
+  responseSchema: createVoteResponse,
+});
+
+const getResultsRequest = z.object({
+  params: z.object({
+    id: z.string().cuid().nullish(),
+  }),
+});
+const getResultsResponse = z.array(
+  z.object({
+    _count: z.number(),
+    option: z.number(),
+  })
+);
+export const getResults = api<
+  z.infer<typeof getResultsRequest>,
+  z.infer<typeof getResultsResponse>
+>({
+  method: HTTPMethod.GET,
+  path: "/result",
+  requestSchema: getResultsRequest,
+  responseSchema: getResultsResponse,
 });

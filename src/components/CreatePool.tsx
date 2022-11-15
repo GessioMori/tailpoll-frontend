@@ -29,8 +29,10 @@ export const CreatePool: FunctionComponent = () => {
   const onSubmit = (data: fieldValues) => {
     createPoolMutation
       .mutateAsync({
-        options: data.options.map((option) => option.value),
-        question: data.question,
+        data: {
+          options: data.options.map((option) => option.value),
+          question: data.question,
+        },
       })
       .then((response) => navigate("/pool/" + response.id));
   };
