@@ -1,35 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
 import { FunctionComponent, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getPool, getResults, getVote } from "../api";
+import { getPoll, getResults, getVote } from "../api";
 import loaderSVG from "../assets/loader.svg";
 import { CreateVoteComponent } from "../components/CreateVote";
-import { PoolButtons } from "../components/PoolButtons";
+import { PollButtons } from "../components/PollButtons";
 import { ResultsComponent } from "../components/Results";
 
-export const PoolPage: FunctionComponent = () => {
-  const { poolId } = useParams();
+export const PollPage: FunctionComponent = () => {
+  const { pollId } = useParams();
 
   const {
     isLoading,
-    isError: isErrorPool,
-    data: poolData,
-    refetch: refetchPool,
+    isError: isErrorPoll,
+    data: pollData,
+    refetch: refetchPoll,
     error,
-  } = useQuery<Awaited<ReturnType<typeof getPool>>, Error>({
+  } = useQuery<Awaited<ReturnType<typeof getPoll>>, Error>({
     queryKey: ["todos"],
-    queryFn: () => getPool({ params: { id: poolId } }),
+    queryFn: () => getPoll({ params: { id: pollId } }),
   });
 
   const { data: resultsData, refetch: fetchResults } = useQuery({
     queryKey: ["results"],
-    queryFn: () => getResults({ params: { id: poolId } }),
+    queryFn: () => getResults({ params: { id: pollId } }),
     enabled: false,
   });
 
   const { data: voteData, refetch: fetchVote } = useQuery({
     queryKey: ["vote"],
-    queryFn: () => getVote({ params: { id: poolId } }),
+    queryFn: () => getVote({ params: { id: pollId } }),
     enabled: false,
   });
 
@@ -37,15 +37,15 @@ export const PoolPage: FunctionComponent = () => {
     fetchVote();
   };
 
-  const handlePoolRefetch = () => refetchPool();
+  const handlePollRefetch = () => refetchPoll();
 
   useEffect(() => {
-    if (poolData?.isOwner) {
+    if (pollData?.isOwner) {
       fetchResults();
-    } else if (poolData) {
+    } else if (pollData) {
       fetchVote();
     }
-  }, [poolData]);
+  }, [pollData]);
 
   useEffect(() => {
     if (voteData) {
@@ -61,13 +61,13 @@ export const PoolPage: FunctionComponent = () => {
     );
   }
 
-  if (isErrorPool) {
+  if (isErrorPoll) {
     return (
       <div className="w-full p-5">
         <div className="flex flex-col mx-auto gap-4 max-w-3xl">
           <div className="text-3xl font-bold text-center">
             {error.message === "Not found"
-              ? "Pool not found!"
+              ? "Poll not found!"
               : "Some error happened, try again!"}
           </div>
         </div>
@@ -77,23 +77,23 @@ export const PoolPage: FunctionComponent = () => {
 
   return (
     <>
-      {(poolData.isOwner || voteData) && resultsData ? (
+      {(pollData.isOwner || voteData) && resultsData ? (
         <ResultsComponent
-          question={poolData.pool.question}
-          options={poolData.pool.options}
+          question={pollData.poll.question}
+          options={pollData.poll.options}
           votes={resultsData}
           userVote={voteData?.option}
         />
       ) : (
         <CreateVoteComponent
-          question={poolData.pool.question}
-          options={poolData.pool.options}
+          question={pollData.poll.question}
+          options={pollData.poll.options}
           fetchVote={handleVoteFetch}
         />
       )}
-      <PoolButtons
-        isOwner={poolData.isOwner}
-        handlePoolRefetch={handlePoolRefetch}
+      <PollButtons
+        isOwner={pollData.isOwner}
+        handlePollRefetch={handlePollRefetch}
       />
     </>
   );

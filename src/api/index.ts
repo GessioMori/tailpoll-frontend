@@ -60,7 +60,7 @@ function api<
   };
 }
 
-const poolObj = z.object({
+const pollObj = z.object({
   id: z.string().cuid(),
   createdAt: z.string(),
   endsAt: z.string().nullish(),
@@ -74,44 +74,44 @@ const voteObj = z.object({
   createdAt: z.string(),
   voterToken: z.string().cuid(),
   option: z.number().min(0).max(9),
-  poolId: z.string().cuid(),
+  pollId: z.string().cuid(),
 });
 
-const getPoolRequest = z.object({
+const getPollRequest = z.object({
   params: z.object({
     id: z.string().cuid().nullish(),
   }),
 });
-const getPoolResponse = z.object({
-  pool: poolObj,
+const getPollResponse = z.object({
+  poll: pollObj,
   isOwner: z.boolean(),
 });
-export const getPool = api<
-  z.infer<typeof getPoolRequest>,
-  z.infer<typeof getPoolResponse>
+export const getPoll = api<
+  z.infer<typeof getPollRequest>,
+  z.infer<typeof getPollResponse>
 >({
   method: HTTPMethod.GET,
-  path: "/pool",
-  requestSchema: getPoolRequest,
-  responseSchema: getPoolResponse,
+  path: "/poll",
+  requestSchema: getPollRequest,
+  responseSchema: getPollResponse,
 });
 
-export const createPoolRequest = z.object({
+export const createPollRequest = z.object({
   data: z.object({
     question: z.string().min(10).max(300),
     options: z.array(z.string().min(2).max(50)).min(2),
     endsAt: z.date().min(new Date()).nullish(),
   }),
 });
-const createPoolResponse = poolObj;
-export const createPool = api<
-  z.infer<typeof createPoolRequest>,
-  z.infer<typeof createPoolResponse>
+const createPollResponse = pollObj;
+export const createPoll = api<
+  z.infer<typeof createPollRequest>,
+  z.infer<typeof createPollResponse>
 >({
   method: HTTPMethod.POST,
-  path: "/pool",
-  requestSchema: createPoolRequest,
-  responseSchema: createPoolResponse,
+  path: "/poll",
+  requestSchema: createPollRequest,
+  responseSchema: createPollResponse,
 });
 
 const createVoteRequest = z.object({
@@ -170,18 +170,18 @@ export const getVote = api<
   responseSchema: getVoteResponse,
 });
 
-const deletePoolRequest = z.object({
+const deletePollRequest = z.object({
   params: z.object({
     id: z.string().cuid().nullish(),
   }),
 });
-const deletePoolResponse = z.any();
-export const deletePool = api<
-  z.infer<typeof deletePoolRequest>,
-  z.infer<typeof deletePoolResponse>
+const deletePollResponse = z.any();
+export const deletePoll = api<
+  z.infer<typeof deletePollRequest>,
+  z.infer<typeof deletePollResponse>
 >({
   method: HTTPMethod.DELETE,
-  path: "/pool",
-  requestSchema: deletePoolRequest,
-  responseSchema: deletePoolResponse,
+  path: "/poll",
+  requestSchema: deletePollRequest,
+  responseSchema: deletePollResponse,
 });

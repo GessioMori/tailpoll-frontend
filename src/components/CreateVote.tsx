@@ -12,11 +12,11 @@ type CreateVoteComponentProps = {
 export const CreateVoteComponent: FunctionComponent<
   CreateVoteComponentProps
 > = ({ question, options, fetchVote }) => {
-  const { poolId } = useParams();
+  const { pollId } = useParams();
 
   const createVoteMutation = useMutation({
     mutationFn: (option: number) =>
-      createVote({ data: { option }, params: { id: poolId } }),
+      createVote({ data: { option }, params: { id: pollId } }),
   });
 
   const handleVote = (option: number) => {

@@ -1,9 +1,9 @@
 import { FunctionComponent } from "react";
 
-export const UserPools: FunctionComponent = () => {
+export const UserPolls: FunctionComponent = () => {
   return (
     <div>
-      <h1>USER POOLS</h1>
+      <h1>USER POLLS</h1>
     </div>
   );
 };

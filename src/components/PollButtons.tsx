@@ -1,30 +1,30 @@
 import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deletePool } from "../api";
+import { deletePoll } from "../api";
 
-type PoolButtonsProps = {
+type PollButtonsProps = {
   isOwner: boolean;
-  handlePoolRefetch: () => Promise<any>;
+  handlePollRefetch: () => Promise<any>;
 };
 
-export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
+export const PollButtons: FunctionComponent<PollButtonsProps> = ({
   isOwner,
-  handlePoolRefetch,
+  handlePollRefetch,
 }) => {
-  const { poolId } = useParams();
+  const { pollId } = useParams();
   const navigate = useNavigate();
   const [refreshed, setRefreshed] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const deletePoolMutation = useMutation({
-    mutationFn: () => deletePool({ params: { id: poolId } }),
+  const deletePollMutation = useMutation({
+    mutationFn: () => deletePoll({ params: { id: pollId } }),
   });
 
-  const handlePoolDeletion = () => {
-    deletePoolMutation
+  const handlePollDeletion = () => {
+    deletePollMutation
       .mutateAsync()
       .then(() => navigate("/"))
       .catch(() => setError("Some error happened, try again!"));
@@ -34,12 +34,12 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
     return (
       <div className="w-full px-5">
         <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
-          Close pool?
-          <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110">
+          Close poll?
+          <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90">
             Yes
           </button>
           <button
-            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
+            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
             onClick={() => setIsClosing(false)}
           >
             No
@@ -53,15 +53,15 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
     return (
       <div className="w-full px-5">
         <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
-          Delete pool?
+          Delete poll?
           <button
-            className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
-            onClick={() => handlePoolDeletion()}
+            className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+            onClick={() => handlePollDeletion()}
           >
-            {deletePoolMutation.isLoading ? "Deleting" : "Yes"}
+            {deletePollMutation.isLoading ? "Deleting" : "Yes"}
           </button>
           <button
-            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-110"
+            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
             onClick={() => setIsDeleting(false)}
           >
             No
@@ -76,9 +76,9 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
       <div className="flex mx-auto gap-2 max-w-3xl justify-between items-center">
         <div>
           <button
-            className="p-2 bg-green-500 rounded-md hover:brightness-110"
+            className="p-2 bg-green-500 rounded-md hover:brightness-90"
             onClick={() =>
-              handlePoolRefetch().then(() => {
+              handlePollRefetch().then(() => {
                 setRefreshed(true);
                 setTimeout(() => setRefreshed(false), 1000);
               })
@@ -120,15 +120,15 @@ export const PoolButtons: FunctionComponent<PoolButtonsProps> = ({
           <div className="flex flex-grow gap-4 justify-end">
             <button
               onClick={() => setIsClosing(true)}
-              className="font-bold bg-sky-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-110 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500"
+              className="font-bold bg-sky-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500"
             >
-              Close pool
+              Close poll
             </button>
             <button
               onClick={() => setIsDeleting(true)}
-              className="font-bold bg-red-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-110 outline outline-2 outline-offset-4 outline-transparent focus:outline-red-500"
+              className="font-bold bg-red-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-red-500"
             >
-              Delete pool
+              Delete poll
             </button>
           </div>
         )}

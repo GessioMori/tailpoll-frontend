@@ -1,16 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
-import { FunctionComponent, useEffect } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { createPool, createPoolRequest } from "../api";
+import { createPoll, createPollRequest } from "../api";
 
 type fieldValues = {
   question: string;
   options: { value: string }[];
 };
 
-export const CreatePool: FunctionComponent = () => {
+export const CreatePoll: FunctionComponent = () => {
+  const [isEndEnable, setIsEndEnable] = useState(false);
   const {
     control,
     register,
@@ -27,20 +28,20 @@ export const CreatePool: FunctionComponent = () => {
   });
   const navigate = useNavigate();
 
-  const createPoolMutation = useMutation({
-    mutationFn: (newPool: z.infer<typeof createPoolRequest>) =>
-      createPool(newPool),
+  const createPollMutation = useMutation({
+    mutationFn: (newPoll: z.infer<typeof createPollRequest>) =>
+      createPoll(newPoll),
   });
 
   const onSubmit = (data: fieldValues) => {
-    createPoolMutation
+    createPollMutation
       .mutateAsync({
         data: {
           options: data.options.map((option) => option.value),
           question: data.question,
         },
       })
-      .then((response) => navigate("/pool/" + response.id));
+      .then((response) => navigate("/poll/" + response.id));
   };
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export const CreatePool: FunctionComponent = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <textarea
-          placeholder="Is Tailpool your favorite pool platform?"
+          placeholder="Is Tailpoll your favorite poll platform?"
           className="w-full  bg-zinc-300 dark:bg-zinc-800 p-2 rounded-md border-2 border-transparent focus:border-2 focus:border-sky-400 outline-none resize-none"
           {...register("question", { required: true, minLength: 10 })}
         />
@@ -79,7 +80,7 @@ export const CreatePool: FunctionComponent = () => {
               />
               <button
                 disabled={fields.length < 3}
-                className="fill-transparent stroke-zinc-700 hover:stroke-red-500 hover:cursor-pointer disabled:stroke-zinc-900 disabled:dark:stroke-zinc-200 disabled:opacity-10 disabled:cursor-not-allowed"
+                className="fill-transparent px-1 stroke-zinc-700 hover:stroke-red-500 hover:cursor-pointer disabled:stroke-zinc-900 disabled:dark:stroke-zinc-200 disabled:opacity-10 disabled:cursor-not-allowed"
                 onClick={() => remove(index)}
               >
                 <svg
@@ -104,10 +105,18 @@ export const CreatePool: FunctionComponent = () => {
             All options must have at least 2 characters!
           </div>
         )}
-        {fields.length < 11 && (
-          <div className="flex justify-start">
+
+        <div className="flex justify-between mt-2">
+          <button
+            type="button"
+            className="bg-green-500 rounded-md px-4 py-2 font-bold hover:brightness-90"
+            onClick={() => setIsEndEnable(true)}
+          >
+            Set end time
+          </button>
+          {fields.length < 11 && (
             <button
-              className="fill-transparent stroke-zinc-700 hover:stroke-sky-600 hover:cursor-pointer"
+              className="fill-transparent stroke-zinc-700 dark:stroke-zinc-400 hover:stroke-sky-600 hover:cursor-pointer"
               onClick={() => append({ value: "" })}
               type="button"
             >
@@ -127,15 +136,16 @@ export const CreatePool: FunctionComponent = () => {
                 <line x1="12" y1="9" x2="12" y2="15" />
               </svg>
             </button>
-          </div>
-        )}
+          )}
+        </div>
+
         <div className="flex justify-center">
           <button
-            className="mt-4 bg-sky-500 px-10 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500 hover:brightness-110 disabled:cursor-not-allowed"
+            className="mt-4 bg-sky-500 px-16 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500 hover:brightness-90 disabled:cursor-not-allowed"
             type="submit"
-            disabled={createPoolMutation.isLoading}
+            disabled={createPollMutation.isLoading}
           >
-            {createPoolMutation.isLoading ? "Creating pool..." : "Create pool"}
+            {createPollMutation.isLoading ? "Creating poll..." : "Create poll"}
           </button>
         </div>
       </form>

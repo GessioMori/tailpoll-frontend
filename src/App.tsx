@@ -7,17 +7,17 @@ import {
 } from "react-router-dom";
 import { Root } from "./components/Root";
 import { Index } from "./pages/Index";
-import { PoolPage } from "./pages/PoolPage";
-import { UserPools } from "./pages/UserPools";
+import { PollPage } from "./pages/PollPage";
+import { UserPolls } from "./pages/UserPolls";
 import { UserVotes } from "./pages/UserVotes";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Root />}>
       <Route index element={<Index />} />
-      <Route path="/pools" element={<UserPools />} />
+      <Route path="/polls" element={<UserPolls />} />
       <Route path="/votes" element={<UserVotes />} />
-      <Route path="/pool/:poolId" element={<PoolPage />} />
+      <Route path="/poll/:pollId" element={<PollPage />} />
     </Route>
   )
 );

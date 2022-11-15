@@ -49,7 +49,7 @@ export const Navbar = () => {
                 isActive ? "underline underline-offset-4" : undefined
               }
             >
-              CREATE POOL
+              CREATE POLL
             </NavLink>
           </li>
           <li
@@ -57,12 +57,12 @@ export const Navbar = () => {
             onClick={() => setIsNavOpen(false)}
           >
             <NavLink
-              to="/pools"
+              to="/polls"
               className={({ isActive }) =>
                 isActive ? "underline underline-offset-4" : undefined
               }
             >
-              MY POOLS
+              MY POLLS
             </NavLink>
           </li>
           <li
