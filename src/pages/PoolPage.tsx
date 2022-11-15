@@ -14,6 +14,7 @@ export const PoolPage: FunctionComponent = () => {
     isLoading,
     isError: isErrorPool,
     data: poolData,
+    refetch: refetchPool,
     error,
   } = useQuery<Awaited<ReturnType<typeof getPool>>, Error>({
     queryKey: ["todos"],
@@ -35,6 +36,8 @@ export const PoolPage: FunctionComponent = () => {
   const handleVoteFetch = () => {
     fetchVote();
   };
+
+  const handlePoolRefetch = () => refetchPool();
 
   useEffect(() => {
     if (poolData?.isOwner) {
@@ -88,7 +91,10 @@ export const PoolPage: FunctionComponent = () => {
           fetchVote={handleVoteFetch}
         />
       )}
-      {poolData.isOwner && <PoolButtons />}
+      <PoolButtons
+        isOwner={poolData.isOwner}
+        handlePoolRefetch={handlePoolRefetch}
+      />
     </>
   );
 };

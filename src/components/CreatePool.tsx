@@ -11,12 +11,18 @@ type fieldValues = {
 };
 
 export const CreatePool: FunctionComponent = () => {
-  const { control, register, handleSubmit } = useForm<fieldValues>();
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<fieldValues>({});
   const { fields, append, prepend, remove } = useFieldArray({
     control,
     name: "options",
     rules: {
       minLength: 2,
+      required: true,
     },
   });
   const navigate = useNavigate();
@@ -51,14 +57,22 @@ export const CreatePool: FunctionComponent = () => {
         <textarea
           placeholder="Is Tailpool your favorite pool platform?"
           className="w-full  bg-zinc-300 dark:bg-zinc-800 p-2 rounded-md border-2 border-transparent focus:border-2 focus:border-sky-400 outline-none resize-none"
-          {...register("question")}
+          {...register("question", { required: true, minLength: 10 })}
         />
+        {errors.question && (
+          <div className="text-sm text-red-400">
+            Question must have at least 10 characters!
+          </div>
+        )}
         {fields.map((field, index) => {
           return (
             <div className="flex gap-2" key={field.id}>
               <input
                 className="w-full bg-zinc-300 dark:bg-zinc-800 p-2 rounded-md border-2 border-transparent focus:border-2 focus:border-sky-400 outline-none"
-                {...register(`options.${index}.value`)}
+                {...register(`options.${index}.value`, {
+                  minLength: 2,
+                  required: true,
+                })}
                 placeholder={
                   index === 0 ? "Yes" : index === 1 ? "No" : undefined
                 }
@@ -85,6 +99,11 @@ export const CreatePool: FunctionComponent = () => {
             </div>
           );
         })}
+        {errors.options && (
+          <div className="text-sm text-red-400">
+            All options must have at least 2 characters!
+          </div>
+        )}
         {fields.length < 11 && (
           <div className="flex justify-start">
             <button
@@ -112,7 +131,7 @@ export const CreatePool: FunctionComponent = () => {
         )}
         <div className="flex justify-center">
           <button
-            className="mt-4 bg-gradient-to-tr from-[#00F260] to-[#0575E6] px-10 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-[#0575E6] hover:brightness-125 disabled:cursor-not-allowed"
+            className="mt-4 bg-sky-500 px-10 py-2 rounded-md font-bold text-zinc-100 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500 hover:brightness-110 disabled:cursor-not-allowed"
             type="submit"
             disabled={createPoolMutation.isLoading}
           >

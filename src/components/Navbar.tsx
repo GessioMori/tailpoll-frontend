@@ -28,7 +28,7 @@ export const Navbar = () => {
       <div
         className={
           isNavOpen
-            ? "absolute top-20 overflow-auto w-full justify-center"
+            ? "absolute top-20 overflow-auto w-full justify-center z-50"
             : "p-4 hidden w-full md:block md:w-auto"
         }
       >

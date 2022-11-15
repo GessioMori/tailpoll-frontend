@@ -33,7 +33,7 @@ export const CreateVoteComponent: FunctionComponent<
           {options.map((option, index) => (
             <button
               key={option}
-              className="w-full border-2 p-4 border-zinc-300 dark:border-zinc-600 rounded-md hover:border-sky-800 dark:hover:border-sky-800 text-left"
+              className="w-full border-2 p-4 border-zinc-300 dark:border-zinc-600 rounded-md hover:border-sky-300 dark:hover:border-sky-800 text-left"
               onClick={() => handleVote(index)}
             >
               {option}
