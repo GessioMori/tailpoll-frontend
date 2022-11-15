@@ -29,26 +29,34 @@ function api<
 }): (data: Request) => Promise<Response> {
   return function (requestData: Request) {
     async function apiCall() {
+      console.log("API CALL");
       if (!requestSchema.safeParse(requestData).success) {
         throw new Error("Bad request");
       }
+      try {
+        const response = await axios({
+          baseURL: import.meta.env.VITE_BASEURL,
+          method,
+          url: path,
+          params: requestData.params,
+          data: requestData.data,
+          withCredentials: true,
+        });
 
-      const response = await axios({
-        baseURL: import.meta.env.VITE_BASEURL,
-        method,
-        url: path,
-        params: requestData.params,
-        data: requestData.data,
-        withCredentials: true,
-      });
+        const result = responseSchema.safeParse(response.data);
 
-      const result = responseSchema.safeParse(response.data);
+        if (!result.success) {
+          throw new Error("Invalid data received");
+        }
 
-      if (!result.success) {
-        throw new Error("Invalid data received");
+        return response.data;
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          throw new Error(err.response?.data.message);
+        } else if (err instanceof Error) {
+          throw new Error(err.message);
+        }
       }
-
-      return response.data;
     }
 
     return apiCall();
@@ -62,6 +70,14 @@ const poolObj = z.object({
   creatorToken: z.string().cuid(),
   question: z.string(),
   options: z.array(z.string()),
+});
+
+const voteObj = z.object({
+  id: z.string().cuid(),
+  createdAt: z.string(),
+  voterToken: z.string().cuid(),
+  option: z.number().min(0).max(9),
+  poolId: z.string().cuid(),
 });
 
 const getPoolRequest = z.object({
@@ -110,14 +126,7 @@ const createVoteRequest = z.object({
     id: z.string().cuid().nullish(),
   }),
 });
-const createVoteResponse = z.object({
-  id: z.string().cuid(),
-  createdAt: z.string(),
-  voterToken: z.string().cuid(),
-  option: z.number().min(0).max(9),
-  poolId: z.string().cuid(),
-});
-
+const createVoteResponse = voteObj;
 export const createVote = api<
   z.infer<typeof createVoteRequest>,
   z.infer<typeof createVoteResponse>
@@ -147,4 +156,20 @@ export const getResults = api<
   path: "/result",
   requestSchema: getResultsRequest,
   responseSchema: getResultsResponse,
+});
+
+const getVoteRequest = z.object({
+  params: z.object({
+    id: z.string().cuid().nullish(),
+  }),
+});
+const getVoteResponse = voteObj;
+export const getVote = api<
+  z.infer<typeof getVoteRequest>,
+  z.infer<typeof getVoteResponse>
+>({
+  method: HTTPMethod.GET,
+  path: "/vote",
+  requestSchema: getVoteRequest,
+  responseSchema: getVoteResponse,
 });

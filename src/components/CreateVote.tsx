@@ -6,11 +6,12 @@ import { createVote } from "../api";
 type CreateVoteComponentProps = {
   question: string;
   options: string[];
+  fetchVote: () => void;
 };
 
 export const CreateVoteComponent: FunctionComponent<
   CreateVoteComponentProps
-> = ({ question, options }) => {
+> = ({ question, options, fetchVote }) => {
   const { poolId } = useParams();
 
   const createVoteMutation = useMutation({
@@ -19,9 +20,7 @@ export const CreateVoteComponent: FunctionComponent<
   });
 
   const handleVote = (option: number) => {
-    createVoteMutation
-      .mutateAsync(option)
-      .then((response) => console.log(response));
+    createVoteMutation.mutateAsync(option).then(() => fetchVote());
   };
 
   return (
@@ -34,7 +33,7 @@ export const CreateVoteComponent: FunctionComponent<
           {options.map((option, index) => (
             <button
               key={option}
-              className="w-full border-2 p-4 border-zinc-300 dark:border-zinc-600 rounded-md hover:border-sky-400 dark:hover:border-sky-400 text-left"
+              className="w-full border-2 p-4 border-zinc-300 dark:border-zinc-600 rounded-md hover:border-sky-800 dark:hover:border-sky-800 text-left"
               onClick={() => handleVote(index)}
             >
               {option}
