@@ -5,12 +5,12 @@ import { deletePoll } from "../api";
 
 type PollButtonsProps = {
   isOwner: boolean;
-  handlePollRefetch: () => Promise<any>;
+  handleResultRefetch: () => Promise<any>;
 };
 
 export const PollButtons: FunctionComponent<PollButtonsProps> = ({
   isOwner,
-  handlePollRefetch,
+  handleResultRefetch,
 }) => {
   const { pollId } = useParams();
   const navigate = useNavigate();
@@ -32,53 +32,49 @@ export const PollButtons: FunctionComponent<PollButtonsProps> = ({
 
   if (isClosing) {
     return (
-      <div className="w-full px-5">
-        <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
-          Close poll?
-          <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90">
-            Yes
-          </button>
-          <button
-            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-            onClick={() => setIsClosing(false)}
-          >
-            No
-          </button>
-        </div>
-      </div>
+      <>
+        Close poll?
+        <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90">
+          Yes
+        </button>
+        <button
+          className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+          onClick={() => setIsClosing(false)}
+        >
+          No
+        </button>
+      </>
     );
   }
 
   if (isDeleting) {
     return (
-      <div className="w-full px-5">
-        <div className="flex mx-auto gap-2 max-w-3xl justify-end items-center">
-          Delete poll?
-          <button
-            className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-            onClick={() => handlePollDeletion()}
-          >
-            {deletePollMutation.isLoading ? "Deleting" : "Yes"}
-          </button>
-          <button
-            className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-            onClick={() => setIsDeleting(false)}
-          >
-            No
-          </button>
-        </div>
-      </div>
+      <>
+        Delete poll?
+        <button
+          className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+          onClick={() => handlePollDeletion()}
+        >
+          {deletePollMutation.isLoading ? "Deleting" : "Yes"}
+        </button>
+        <button
+          className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+          onClick={() => setIsDeleting(false)}
+        >
+          No
+        </button>
+      </>
     );
   }
 
   return (
-    <div className="w-full px-5">
+    <div className="w-full">
       <div className="flex mx-auto gap-2 max-w-3xl justify-between items-center">
         <div>
           <button
             className="p-2 bg-green-500 rounded-md hover:brightness-90"
             onClick={() =>
-              handlePollRefetch().then(() => {
+              handleResultRefetch().then(() => {
                 setRefreshed(true);
                 setTimeout(() => setRefreshed(false), 1000);
               })

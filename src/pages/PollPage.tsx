@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { isBefore } from "date-fns";
+import { format, isBefore } from "date-fns";
 import { FunctionComponent, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getPoll, getResults, getVote } from "../api";
 import loaderSVG from "../assets/loader.svg";
 import { CreateVoteComponent } from "../components/CreateVote";
-import { PollButtons } from "../components/PollButtons";
 import { ResultsComponent } from "../components/Results";
 
 export const PollPage: FunctionComponent = () => {
@@ -20,37 +19,44 @@ export const PollPage: FunctionComponent = () => {
   } = useQuery<Awaited<ReturnType<typeof getPoll>>, Error>({
     queryKey: ["todos"],
     queryFn: () => getPoll({ params: { id: pollId } }),
+    enabled: false,
   });
 
-  const { data: resultsData, refetch: fetchResults } = useQuery({
+  const { data: resultsData, refetch: refetchResult } = useQuery({
     queryKey: ["results"],
     queryFn: () => getResults({ params: { id: pollId } }),
     enabled: false,
   });
 
-  const { data: voteData, refetch: fetchVote } = useQuery({
+  const { data: voteData, refetch: refetchVote } = useQuery({
     queryKey: ["vote"],
     queryFn: () => getVote({ params: { id: pollId } }),
     enabled: false,
   });
 
   const handleVoteFetch = () => {
-    fetchVote();
+    refetchVote().then((vote) => {
+      if (vote.data) {
+        refetchResult();
+      }
+    });
   };
 
-  const handlePollRefetch = () => refetchPoll();
+  const handleResultRefetch = () => refetchResult();
 
   useEffect(() => {
-    if (pollData?.isOwner) {
-      fetchResults();
-    } else if (pollData) {
-      fetchVote();
-    }
-  }, [pollData]);
-
-  useEffect(() => {
-    fetchResults();
-  }, [voteData]);
+    refetchPoll().then((poll) => {
+      if (poll.data?.isOwner) {
+        refetchResult();
+      } else {
+        refetchVote().then((vote) => {
+          if (vote.data) {
+            refetchResult();
+          }
+        });
+      }
+    });
+  }, []);
 
   if (isLoading) {
     return (
@@ -75,31 +81,42 @@ export const PollPage: FunctionComponent = () => {
   }
 
   return (
-    <>
-      {(pollData.isOwner ||
-        voteData ||
-        (pollData.poll.endsAt &&
-          isBefore(new Date(pollData.poll.endsAt), new Date()))) &&
-      resultsData ? (
-        <ResultsComponent
-          question={pollData.poll.question}
-          options={pollData.poll.options}
-          votes={resultsData}
-          userVote={voteData?.option}
-          endsAt={pollData.poll.endsAt}
-        />
-      ) : (
-        <CreateVoteComponent
-          question={pollData.poll.question}
-          options={pollData.poll.options}
-          endsAt={pollData.poll.endsAt}
-          fetchVote={handleVoteFetch}
-        />
-      )}
-      <PollButtons
-        isOwner={pollData.isOwner}
-        handlePollRefetch={handlePollRefetch}
-      />
-    </>
+    <div className="w-full p-5">
+      <div className="flex flex-col mx-auto gap-4 max-w-3xl">
+        <div className="text-3xl font-bold">
+          <h1>{pollData.poll.question}</h1>
+        </div>
+        {pollData.poll.endsAt && (
+          <div className="text-md font-thin">
+            <h3>
+              {isBefore(new Date(), new Date(pollData.poll.endsAt))
+                ? "Ends at: "
+                : "Ended at :"}
+
+              {format(new Date(pollData.poll.endsAt), " dd/MM/yyyy - HH:mm")}
+            </h3>
+          </div>
+        )}
+        {(pollData.isOwner ||
+          voteData ||
+          (pollData.poll.endsAt &&
+            isBefore(new Date(pollData.poll.endsAt), new Date()))) &&
+        resultsData ? (
+          <ResultsComponent
+            options={pollData.poll.options}
+            votes={resultsData}
+            userVote={voteData?.option}
+            isOwner={pollData.isOwner}
+            handleResultRefetch={handleResultRefetch}
+          />
+        ) : (
+          <CreateVoteComponent
+            options={pollData.poll.options}
+            endsAt={pollData.poll.endsAt}
+            fetchVote={handleVoteFetch}
+          />
+        )}
+      </div>
+    </div>
   );
 };
