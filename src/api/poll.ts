@@ -94,3 +94,16 @@ export const endPoll = api<
   requestSchema: endPollRequest,
   responseSchema: endPollResponse,
 });
+
+// GET USER POLLS
+const getUserPollsRequest = z.object({});
+const getUserPollsResponse = z.array(pollObj);
+export const getUserPolls = api<
+  z.infer<typeof getUserPollsRequest>,
+  z.infer<typeof getUserPollsResponse>
+>({
+  method: HTTPMethod.GET,
+  path: "/polls",
+  requestSchema: getUserPollsRequest,
+  responseSchema: getUserPollsResponse,
+});
