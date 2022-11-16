@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { api, HTTPMethod } from ".";
 
-const pollObj = z.object({
+export const pollObj = z.object({
   id: z.string().cuid(),
   createdAt: z.string(),
   endsAt: z.string().nullish(),

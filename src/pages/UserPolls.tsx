@@ -40,9 +40,9 @@ export const UserPolls: FunctionComponent = () => {
     poll2: typeof polls[number]
   ) => {
     if (!poll1.endsAt && poll2.endsAt) {
-      return 1;
-    } else if (poll1.endsAt && !poll2.endsAt) {
       return -1;
+    } else if (poll1.endsAt && !poll2.endsAt) {
+      return 1;
     } else if (poll1.endsAt && poll2.endsAt) {
       return (
         new Date(poll2.endsAt).getTime() - new Date(poll1.endsAt).getTime()
@@ -65,7 +65,7 @@ export const UserPolls: FunctionComponent = () => {
               <Link to={`/poll/${poll.id}`}>
                 <div className="w-full flex flex-col gap-2 border-2 p-4 border-zinc-300 dark:border-zinc-600 rounded-md hover:border-sky-300 dark:hover:border-sky-800">
                   <div className="font-bold text-xl">{poll.question}</div>
-                  <div className=" flex font-light flex-wrap gap-6">
+                  <div className=" flex font-light flex-wrap gap-x-6">
                     <div>
                       Created at:
                       {format(new Date(poll.createdAt), " dd/MM/yyyy - HH:mm")}
@@ -75,10 +75,7 @@ export const UserPolls: FunctionComponent = () => {
                         {isBefore(new Date(poll.endsAt), new Date())
                           ? "Ended at:"
                           : "Ends at:"}{" "}
-                        {format(
-                          new Date(poll.createdAt),
-                          " dd/MM/yyyy - HH:mm"
-                        )}
+                        {format(new Date(poll.endsAt), " dd/MM/yyyy - HH:mm")}
                       </div>
                     )}
                   </div>
