@@ -3,7 +3,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { createPoll, createPollRequest } from "../api";
+import { createPoll, createPollRequest } from "../api/poll";
 import { EndsInComponentMemo } from "./EndsIn";
 
 export type fieldValues = {

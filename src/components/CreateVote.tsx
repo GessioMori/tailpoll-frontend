@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent } from "react";
 import { useParams } from "react-router-dom";
-import { createVote } from "../api";
+import { createVote } from "../api/vote";
 
 type CreateVoteComponentProps = {
   options: string[];

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deletePoll } from "../api";
+import { deletePoll } from "../api/poll";
 
 type PollButtonsProps = {
   isOwner: boolean;
