@@ -6,12 +6,12 @@ import { createVote } from "../api/vote";
 type CreateVoteComponentProps = {
   options: string[];
   endsAt?: string | null;
-  fetchVote: () => void;
+  refetchVote: () => void;
 };
 
 export const CreateVoteComponent: FunctionComponent<
   CreateVoteComponentProps
-> = ({ options, fetchVote }) => {
+> = ({ options, refetchVote }) => {
   const { pollId } = useParams();
 
   const createVoteMutation = useMutation({
@@ -20,7 +20,7 @@ export const CreateVoteComponent: FunctionComponent<
   });
 
   const handleVote = (option: number) => {
-    createVoteMutation.mutateAsync(option).then(() => fetchVote());
+    createVoteMutation.mutateAsync(option).then(() => refetchVote());
   };
 
   return (

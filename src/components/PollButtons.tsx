@@ -1,16 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deletePoll } from "../api/poll";
+import { deletePoll, endPoll } from "../api/poll";
 
 type PollButtonsProps = {
   isOwner: boolean;
   handleResultRefetch: () => Promise<any>;
+  handlePollRefetch: () => Promise<any>;
+  isEnded: boolean;
 };
 
 export const PollButtons: FunctionComponent<PollButtonsProps> = ({
   isOwner,
   handleResultRefetch,
+  handlePollRefetch,
+  isEnded,
 }) => {
   const { pollId } = useParams();
   const navigate = useNavigate();
@@ -20,7 +24,21 @@ export const PollButtons: FunctionComponent<PollButtonsProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const deletePollMutation = useMutation({
-    mutationFn: () => deletePoll({ params: { id: pollId } }),
+    mutationFn: () =>
+      deletePoll({
+        params: {
+          id: pollId,
+        },
+      }),
+  });
+
+  const endPollMutation = useMutation({
+    mutationFn: () =>
+      endPoll({
+        params: {
+          id: pollId,
+        },
+      }),
   });
 
   const handlePollDeletion = () => {
@@ -30,46 +48,20 @@ export const PollButtons: FunctionComponent<PollButtonsProps> = ({
       .catch(() => setError("Some error happened, try again!"));
   };
 
-  if (isClosing) {
-    return (
-      <>
-        Close poll?
-        <button className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90">
-          Yes
-        </button>
-        <button
-          className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-          onClick={() => setIsClosing(false)}
-        >
-          No
-        </button>
-      </>
-    );
-  }
-
-  if (isDeleting) {
-    return (
-      <>
-        Delete poll?
-        <button
-          className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-          onClick={() => handlePollDeletion()}
-        >
-          {deletePollMutation.isLoading ? "Deleting" : "Yes"}
-        </button>
-        <button
-          className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
-          onClick={() => setIsDeleting(false)}
-        >
-          No
-        </button>
-      </>
-    );
-  }
+  const handlePollEnding = () => {
+    endPollMutation
+      .mutateAsync()
+      .then(() => {
+        setIsClosing(false);
+        handlePollRefetch();
+      })
+      .catch(() => setError("Some error happened, try again!"));
+  };
 
   return (
     <div className="w-full">
       <div className="flex mx-auto gap-2 max-w-3xl justify-between items-center">
+        {error && <div className="text-sm text-red-400">{error}</div>}
         <div>
           <button
             className="p-2 bg-green-500 rounded-md hover:brightness-90"
@@ -112,21 +104,58 @@ export const PollButtons: FunctionComponent<PollButtonsProps> = ({
             )}
           </button>
         </div>
-        {isOwner && (
-          <div className="flex flex-grow gap-4 justify-end">
+        {isClosing && !isEnded ? (
+          <div className="flex gap-2 items-center">
+            Close poll?
             <button
-              onClick={() => setIsClosing(true)}
-              className="font-bold bg-sky-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500"
+              className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+              onClick={() => handlePollEnding()}
             >
-              Close poll
+              {endPollMutation.isLoading ? "Ending" : "Yes"}
             </button>
             <button
-              onClick={() => setIsDeleting(true)}
-              className="font-bold bg-red-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-red-500"
+              className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+              onClick={() => setIsClosing(false)}
             >
-              Delete poll
+              No
             </button>
           </div>
+        ) : isDeleting ? (
+          <div className="flex gap-2 items-center">
+            Delete poll?
+            <button
+              className="bg-red-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+              onClick={() => handlePollDeletion()}
+            >
+              {deletePollMutation.isLoading ? "Deleting" : "Yes"}
+            </button>
+            <button
+              className="bg-sky-500 rounded-md px-4 py-2 font-bold text-zinc-200 hover:brightness-90"
+              onClick={() => setIsDeleting(false)}
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          isOwner && (
+            <div className="flex flex-grow gap-4 justify-end">
+              {!isEnded && (
+                <button
+                  onClick={() => setIsClosing(true)}
+                  className="font-bold bg-sky-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-sky-500"
+                >
+                  Close poll
+                </button>
+              )}
+
+              <button
+                onClick={() => setIsDeleting(true)}
+                className="font-bold bg-red-500 px-4 py-2 rounded-md text-zinc-100 hover:brightness-90 outline outline-2 outline-offset-4 outline-transparent focus:outline-red-500"
+              >
+                Delete poll
+              </button>
+            </div>
+          )
         )}
       </div>
     </div>

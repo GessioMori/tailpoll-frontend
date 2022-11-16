@@ -10,13 +10,14 @@ const pollObj = z.object({
   options: z.array(z.string()),
 });
 
-// GET POLL
-
-const getPollRequest = z.object({
+const pollParams = z.object({
   params: z.object({
     id: z.string().cuid().nullish(),
   }),
 });
+
+// GET POLL
+const getPollRequest = pollParams;
 const getPollResponse = z.object({
   poll: pollObj,
   isOwner: z.boolean(),
@@ -32,7 +33,6 @@ export const getPoll = api<
 });
 
 // CREATE POLL
-
 export const createPollRequest = z.object({
   data: z.object({
     question: z.string().min(10).max(300),
@@ -52,12 +52,7 @@ export const createPoll = api<
 });
 
 // GET RESULTS
-
-const getResultsRequest = z.object({
-  params: z.object({
-    id: z.string().cuid().nullish(),
-  }),
-});
+const getResultsRequest = pollParams;
 const getResultsResponse = z.array(
   z.object({
     _count: z.number(),
@@ -75,12 +70,7 @@ export const getResults = api<
 });
 
 // DELETE POLL
-
-const deletePollRequest = z.object({
-  params: z.object({
-    id: z.string().cuid().nullish(),
-  }),
-});
+const deletePollRequest = pollParams;
 const deletePollResponse = z.any();
 export const deletePoll = api<
   z.infer<typeof deletePollRequest>,
@@ -90,4 +80,17 @@ export const deletePoll = api<
   path: "/poll",
   requestSchema: deletePollRequest,
   responseSchema: deletePollResponse,
+});
+
+// END POLL
+const endPollRequest = pollParams;
+const endPollResponse = pollObj;
+export const endPoll = api<
+  z.infer<typeof endPollRequest>,
+  z.infer<typeof endPollResponse>
+>({
+  method: HTTPMethod.PATCH,
+  path: "/poll",
+  requestSchema: endPollRequest,
+  responseSchema: endPollResponse,
 });

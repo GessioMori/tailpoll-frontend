@@ -35,7 +35,7 @@ export const PollPage: FunctionComponent = () => {
     enabled: false,
   });
 
-  const handleVoteFetch = () => {
+  const handleVoteRefetch = () => {
     refetchVote().then((vote) => {
       if (vote.data) {
         refetchResult();
@@ -44,6 +44,8 @@ export const PollPage: FunctionComponent = () => {
   };
 
   const handleResultRefetch = () => refetchResult();
+
+  const handlePollRefetch = () => refetchPoll();
 
   useEffect(() => {
     refetchPoll().then((poll) => {
@@ -81,6 +83,10 @@ export const PollPage: FunctionComponent = () => {
     );
   }
 
+  const isEnded =
+    !!pollData.poll.endsAt &&
+    isBefore(new Date(pollData.poll.endsAt), new Date());
+
   return (
     <div className="w-full p-5">
       <div className="flex flex-col mx-auto gap-4 max-w-3xl">
@@ -90,9 +96,7 @@ export const PollPage: FunctionComponent = () => {
         {pollData.poll.endsAt && (
           <div className="text-md font-thin">
             <h3>
-              {isBefore(new Date(), new Date(pollData.poll.endsAt))
-                ? "Ends at: "
-                : "Ended at :"}
+              {!isEnded ? "Ends at: " : "Ended at :"}
 
               {format(new Date(pollData.poll.endsAt), " dd/MM/yyyy - HH:mm")}
             </h3>
@@ -109,12 +113,14 @@ export const PollPage: FunctionComponent = () => {
             userVote={voteData?.option}
             isOwner={pollData.isOwner}
             handleResultRefetch={handleResultRefetch}
+            handlePollRefetch={handlePollRefetch}
+            isEnded={isEnded}
           />
         ) : (
           <CreateVoteComponent
             options={pollData.poll.options}
             endsAt={pollData.poll.endsAt}
-            fetchVote={handleVoteFetch}
+            refetchVote={handleVoteRefetch}
           />
         )}
       </div>

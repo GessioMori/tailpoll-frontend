@@ -9,7 +9,9 @@ type ResultsComponentProps = {
   }[];
   userVote?: number;
   isOwner: boolean;
+  isEnded: boolean;
   handleResultRefetch: () => Promise<any>;
+  handlePollRefetch: () => Promise<any>;
 };
 
 export const ResultsComponent: FunctionComponent<ResultsComponentProps> = ({
@@ -18,6 +20,8 @@ export const ResultsComponent: FunctionComponent<ResultsComponentProps> = ({
   userVote,
   isOwner,
   handleResultRefetch,
+  handlePollRefetch,
+  isEnded,
 }) => {
   const totalVotes = votes.reduce((acc, cur) => acc + cur._count, 0);
 
@@ -88,6 +92,8 @@ export const ResultsComponent: FunctionComponent<ResultsComponentProps> = ({
       <PollButtons
         isOwner={isOwner}
         handleResultRefetch={handleResultRefetch}
+        handlePollRefetch={handlePollRefetch}
+        isEnded={isEnded}
       />
     </>
   );

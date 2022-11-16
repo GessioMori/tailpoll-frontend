@@ -54,6 +54,7 @@ export const CreatePoll: FunctionComponent = () => {
   }, []);
 
   const handleSetEndToggler = () => {
+    setEndsAt(undefined);
     setIsEndEnable((current) => !current);
   };
 
