@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { FunctionComponent } from "react";
 import { useParams } from "react-router-dom";
 import { createVote } from "../api/vote";
+import loaderSVG from "../assets/loader.svg";
 
 type CreateVoteComponentProps = {
   options: string[];
@@ -34,6 +35,11 @@ export const CreateVoteComponent: FunctionComponent<
           {option}
         </button>
       ))}
+      {createVoteMutation.isLoading && (
+        <div className="flex justify-center w-full h-20">
+          <img src={loaderSVG} />
+        </div>
+      )}
     </div>
   );
 };
