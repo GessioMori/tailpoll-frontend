@@ -110,7 +110,7 @@ export const PollPage: FunctionComponent = () => {
           <ResultsComponent
             options={pollData.poll.options}
             votes={resultsData}
-            userVote={voteData?.option}
+            userVote={pollData.isOwner ? undefined : voteData?.option}
             isOwner={pollData.isOwner}
             handleResultRefetch={handleResultRefetch}
             handlePollRefetch={handlePollRefetch}
